@@ -16,12 +16,13 @@ client.on('message', message => {
 		message.channel.send(`Thanks for sharing your work, <@${message.author.id}>! Would you like ${attachment.name} shown in our gallery?
 
 Options: :regional_indicator_a: Always, :thumbsup: Yes please, :thumbsdown: No thank you, :regional_indicator_n: No, and don't ask me again`)
-		.then(sentMessage => {
-			sentMessage.react('🇦')
-				.then(() => sentMessage.react('👍'))
-				.then(() => sentMessage.react('👎'))
-				.then(() => sentMessage.react('🇳'))
-			;
+		.then(async sentMessage => {
+			try {
+				await sentMessage.react('🇦');
+				await sentMessage.react('👍');
+				await sentMessage.react('👎');
+				await sentMessage.react('🇳');
+			} catch(err) { return }
 			const reactjiFilter = (reaction, user) => {
 				return user.id === message.author.id && ['🇦', '👍', '👎', '🇳'].includes(reaction.emoji.name)
 			}		
@@ -30,9 +31,9 @@ Options: :regional_indicator_a: Always, :thumbsup: Yes please, :thumbsdown: No t
 					sentMessage.channel.send("Received " + collected.firstKey());
 					sentMessage.delete();
 				})
-				.catch()
+				.catch(() => { return })
 			;
 			sentMessage.delete({ timeout: messageExpirationTime });
-		})
+		}).catch(() => { return });
 	});
 })
