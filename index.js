@@ -1,7 +1,19 @@
 require('dotenv').config();
 const Discord = require('discord.js');
+const fs = require('fs');
 const client = new Discord.Client();
-// const { prefix } = require('./config.json');
+client.commands = new Discord.Collection();
+const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+const { prefix } = require('./config.json');
+const Sequelize = require('sequelize');
+
+for (const file of commandFiles) {
+	const command = require(`./commands/${file}`);
+
+	// set a new item in the Collection
+	// with the key as the command name and the value as the exported module
+	client.commands.set(command.name, command);
+}
 
 const messageExpirationTime = 1000 * 60 * 5; // 5 minutes
 
@@ -11,6 +23,21 @@ client.once('ready', () => {
 client.login(process.env.BOT_TOKEN);
 
 client.on('message', message => {
+
+	if (message.content.startsWith(prefix)) {
+		const input = message.content.slice(prefix.length).trim().split(' ');
+		const command = input.shift().toLowerCase();
+		const args = input.join(' ');
+
+		if (!client.commands.has(command)) return;
+		try {
+			client.commands.get(command).execute(message, args);
+		} catch (error) {
+			console.error(error);
+			message.reply("Sorry, I didn't understand that.");
+		}
+	}
+
 	message.attachments.each(attachment => {
 		console.log("Detected ", attachment.name)
 		message.channel.send(`Thanks for sharing your work, <@${message.author.id}>! Would you like ${attachment.name} shown in our gallery?
@@ -36,4 +63,4 @@ Options: :regional_indicator_a: Always, :thumbsup: Yes please, :thumbsdown: No t
 			sentMessage.delete({ timeout: messageExpirationTime });
 		}).catch(() => { return });
 	});
-})
+});
