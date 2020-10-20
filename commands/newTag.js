@@ -4,7 +4,7 @@ module.exports = {
 	name: 'newtag',
 	description: 'Create a new tag',
 	async execute(message, args) {
-		if (!args) {
+		if (args.length == 0) {
 			message.channel.send("This command creates a new tag. Example: To create a \"Characters\" tag, type `/newtag Characters`")
 		} else {
 			try {
@@ -23,6 +23,5 @@ module.exports = {
 				return message.channel.send("Couldn't create that tag. Something went wrong.");
 			}
 		}
-		message.reply("This command will create a new tag. Arguments: " + args)
 	},
 };
