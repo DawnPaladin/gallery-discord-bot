@@ -1,3 +1,4 @@
 {
-	"prefix": "!"
+	"prefix": "!",
+	"databaseName": "pilotnet-gallery-bot"
 }
