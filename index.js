@@ -1,8 +1,11 @@
+// startup: initialize constants
+const messageExpirationTime = 1000 * 60 * 5; // 5 minutes
+const wipeDatabase = false;
+
 // startup: Node environment
 require('dotenv').config();
 const fs = require('fs');
-const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
-const { prefix, databaseName } = require('./config.json');
+const { prefix } = require('./config.json');
 
 // startup: Discord
 const Discord = require('discord.js');
@@ -10,17 +13,10 @@ const client = new Discord.Client();
 client.commands = new Discord.Collection();
 
 // startup: database
-const Sequelize = require('sequelize');
-const sequelize = new Sequelize(databaseName, process.env.DATABASE_USERNAME, process.env.DATABASE_PASSWORD, {
-	host: 'localhost',
-	dialect: 'postgres',
-	logging: false
-});
-
-// startup: initialize constants
-const messageExpirationTime = 1000 * 60 * 5; // 5 minutes
+const { Sequelize, database, Tags } = require('./database');
 
 // starup: load command files
+const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 for (const file of commandFiles) {
 	const command = require(`./commands/${file}`);
 
@@ -30,17 +26,23 @@ for (const file of commandFiles) {
 }
 
 client.once('ready', () => {
+	if (wipeDatabase) {
+		Tags.sync({force: true});
+	} else {
+		Tags.sync();
+	}
 	console.log("Starting gallery-bot");
 });
 client.login(process.env.BOT_TOKEN);
 // startup complete
 
+// monitor messages for attachments
 client.on('message', message => {
 
 	if (message.content.startsWith(prefix)) {
-		const input = message.content.slice(prefix.length).trim().split(' ');
+		const input = message.content.slice(prefix.length).trim().split(/ +/);
 		const command = input.shift().toLowerCase();
-		const args = input.join(' ');
+		const args = input;
 
 		if (!client.commands.has(command)) return;
 		try {
