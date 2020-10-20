@@ -12,6 +12,7 @@ module.exports = {
 				const rowCount = await Tags.destroy({ where: { name: tagName }});
 				if (rowCount == 0) {
 					return message.channel.send(`Tag \`${tagName}\` not found.`);
+					// TODO: Confirm tag deletion
 				} else {
 					return message.channel.send(`Tag \`${tagName}\` deleted.`);
 				}
