@@ -1,6 +1,5 @@
 // startup: initialize constants
 const messageExpirationTime = 1000 * 60 * 5; // 5 minutes
-const wipeDatabase = false;
 
 // startup: Node environment
 require('dotenv').config();
@@ -11,9 +10,6 @@ const { prefix } = require('./config.json');
 const Discord = require('discord.js');
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
-
-// startup: database
-const { Sequelize, database, Tags } = require('./database');
 
 // starup: load command files
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
@@ -26,11 +22,6 @@ for (const file of commandFiles) {
 }
 
 client.once('ready', () => {
-	if (wipeDatabase) {
-		Tags.sync({force: true});
-	} else {
-		Tags.sync();
-	}
 	console.log("Starting gallery-bot");
 });
 client.login(process.env.BOT_TOKEN);

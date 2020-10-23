@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/DawnPaladin/gallery-discord-bot#readme",
   "dependencies": {
+    "axios": "^0.20.0",
     "discord.js": "^12.3.1",
     "dotenv": "^8.2.0",
     "eslint": "^7.11.0",

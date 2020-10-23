@@ -1,4 +1,4 @@
-const { Tags } = require('../database');
+const { db } = require('../database');
 
 module.exports = {
 	name: 'newtag',
@@ -9,10 +9,11 @@ module.exports = {
 		} else {
 			try {
 				const tagName = args[0];
-				const tag = await Tags.create({
+				db.post('tags.json', {
 					name: tagName,
 					createdBy: message.author.tag // e.g. DawnPaladin#5461 https://discord.js.org/#/docs/main/stable/class/User?scrollTo=tag
-				});
+				}).then(response => console.log(response))
+				.catch(response => console.warn("Error creating tag", response.toJSON()));
 				console.log(tagName, "created by", message.author.tag)
 				return message.channel.send(`Created \`${tagName}\` tag.`)
 			} catch (error) {
